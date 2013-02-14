@@ -29,7 +29,7 @@ quick to parse with any modern ruby (see `read_versions.rb`).
 
 These files have a slightly more complex format, but for consistency they begin
 with an outer level format that is similar to versions.list, with a space
-separated key -> values list. Not that spaces are allowed in values, but there
+separated key -> values list. Note that spaces are allowed in values, but there
 is only one key -> values list per line (so `split(' ', 2)`).
 
 The values format is more complex and presently non-standard, but it is a
