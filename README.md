@@ -59,6 +59,18 @@ ruby example_read_versions.rb  0.70s user 0.13s system 99% cpu 0.838 total
 Parsing the rails dependency index:
 ruby example_read_deps.rb  0.08s user 0.04s system 96% cpu 0.126 total
 
+Bandwidth:
+After generic gzip transport compression, the versions.list is half the size of
+the old specs.4.8 marshal format. The deps entries are 20% the size of the specs
+files (202mb vs 1.1gb), and a gzip tarball of all deps files is only 2.7MB, vs
+20MB for all the marshalled specs. It may be sensible to periodically preseed
+clients with these tarballs, followed by periodic incremental updates of single
+files.  In all cases, it's important to note that these lightweight ascii
+formats compress better through gzip, and also lend themselves to progressive
+updates and efficient syncing.
+
+General:
+
 After caching all the gemspecs, on my Macbook Air, generation of these indices
 for the whole of the rubygems.org gems data set took 3 mintes. Considering that
 the reader examples also allow for progressive updates as they coerce all
