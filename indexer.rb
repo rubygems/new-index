@@ -33,7 +33,7 @@ end
 
 # names.list is useful for first-stage discovery in mirrors, and also for the
 # command line metaphone/hamming distance helpers.
-open('names.list', 'w+') { |io| io.puts *spec_hash.keys }
+open('names.list', 'w+') { |io| io.puts(*spec_hash.keys) }
 
 # versions.list is useful for second stage discovery in mirrors, and also for
 # single-gem command line installations or progressive (unresolved)
