@@ -144,7 +144,9 @@ deps_ts = Array.new(50) do
       open(file, "a+") do |io|
         deps = spec.dependencies.select { |d| d.respond_to?(:type) ? d.type == :runtime : true }
         deps.map! { |d| d.kind_of?(Array) ? "#{d.first} #{d[1]}" : "#{d.name}:#{d.requirements_list.join("&")}" }
-        io.puts "#{spec.version.to_s} #{deps.join(",")}"
+        reqs = ["ruby", spec.required_ruby_version, "rubygems", spec.required_rubygems_version]
+        reqs.map! { |n,r| "#{n}:#{r.requirements.map{|o,v| "#{o} #{v}" }.join("&")}" if r }
+        io.puts "#{spec.version.to_s} #{[deps.join(","), reqs.compact.join(",")].join("|")}"
       end
     end
   end
