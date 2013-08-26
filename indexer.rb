@@ -145,9 +145,10 @@ deps_ts = Array.new(50) do
         deps = spec.dependencies.select { |d| d.respond_to?(:type) ? d.type == :runtime : true }
         deps.map! { |d| d.kind_of?(Array) ? "#{d.first} #{d[1]}" : "#{d.name}:#{d.requirements_list.join("&")}" }
         reqs = {"ruby" => spec.required_ruby_version, "rubygems" => spec.required_rubygems_version}.to_a
-        reqs.map! { |n,r| "#{n}:#{r.requirements.map{|o,v| "#{o} #{v}" }.join("&")}" if r }
-        io.puts "#{spec.version.to_s} #{[deps.join(","), reqs.compact.join(",")].join("|")}"
+        reqs.map! { |n,r| "#{n}:#{r.requirements.map{|o,v| "#{o} #{v}" }.join("&")}" if r && !r.none? }
+        io.puts "#{spec.version.to_s} #{[deps.join(","), reqs.compact.join(",")].reject(&:empty?).join("|")}"
       end
+
     end
   end
 end
