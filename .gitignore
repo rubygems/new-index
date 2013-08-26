@@ -5,3 +5,4 @@ names.list
 specs
 deps
 gems
+*.sha512

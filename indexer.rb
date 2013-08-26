@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-
 require 'open-uri'
+require 'digest/sha2'
 
 specs = []
 
@@ -34,6 +34,7 @@ end
 # names.list is useful for first-stage discovery in mirrors, and also for the
 # command line metaphone/hamming distance helpers.
 open('names.list', 'w+') { |io| io.puts(*spec_hash.keys) }
+File.write('names.list.sha512', Digest::SHA512.file('names.list').hexdigest)
 
 # versions.list is useful for second stage discovery in mirrors, and also for
 # single-gem command line installations or progressive (unresolved)
@@ -50,6 +51,8 @@ open('versions.list', 'w+') do |io|
     io.puts "#{name} #{versions.join(",")}"
   end
 end
+File.write('versions.list.sha512', Digest::SHA512.file('versions.list').hexdigest)
+
 
 require 'fileutils'
 require 'thread'
