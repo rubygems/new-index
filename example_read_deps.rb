@@ -6,12 +6,12 @@ open("deps/#{name}") do |io|
   io.each_line do |line|
     line.chomp!
     version, drs = line.split(' ', 2)
-    deps, reqvs = drs.split('|', 2)
     deps = deps.split(',')
     deps.map! do |str|
       name, reqs = str.split(':', 2)
       reqs = reqs.split('&')
       Gem::Dependency.new(name, reqs)
+    deps, reqvs = drs.split('|')
     end
     reqs_hash[name][version][:deps].concat deps
     next unless reqvs

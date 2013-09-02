@@ -144,12 +144,18 @@ deps_ts = Array.new(50) do
 
       file = "deps/#{spec.name}"
 
+      deps = spec.dependencies.select { |d| d.respond_to?(:type) ? d.type == :runtime : true }
+      deps.map! { |d| d.kind_of?(Array) ? "#{d.first} #{d[1]}" : "#{d.name}:#{d.requirements_list.join("&")}" }
+
+      reqs = {"ruby" => spec.required_ruby_version, "rubygems" => spec.required_rubygems_version}.to_a
+      reqs.map! { |n,r| "#{n}:#{r.requirements.map{|o,v| "#{o} #{v}" }.join("&")}" if r && !r.none? }
+
+      vstr = "#{spec.version.to_s}"
+      vstr << "-#{spec.platform.to_s}" unless spec.platform == "ruby"
+      vstr << " " << [deps.join(","), reqs.compact.join(",")].reject(&:empty?).join("|")
+
       open(file, "a+") do |io|
-        deps = spec.dependencies.select { |d| d.respond_to?(:type) ? d.type == :runtime : true }
-        deps.map! { |d| d.kind_of?(Array) ? "#{d.first} #{d[1]}" : "#{d.name}:#{d.requirements_list.join("&")}" }
-        reqs = {"ruby" => spec.required_ruby_version, "rubygems" => spec.required_rubygems_version}.to_a
-        reqs.map! { |n,r| "#{n}:#{r.requirements.map{|o,v| "#{o} #{v}" }.join("&")}" if r && !r.none? }
-        io.puts "#{spec.version.to_s} #{[deps.join(","), reqs.compact.join(",")].reject(&:empty?).join("|")}"
+        io.puts vstr
       end
 
     end
