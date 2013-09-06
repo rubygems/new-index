@@ -16,6 +16,14 @@
 This is just a line separated list of names, trivial to consume with xargs(1),
 and any other tool.
 
+Names may be sorted alphabetically, but don't have to be. For example:
+
+```
+a_gem
+bees_in_my_eyes
+foo
+```
+
 ### versions.list
 
 This is a key -> values list of name to `version-platform`. While this
@@ -24,6 +32,14 @@ complexities, as it is much more rare than the omitted default `ruby` platform.
 This list is designed to be able to be easily joined using tools like awk(1) to
 produce standard `name-version[-platform].gem` file names. It is also easy and
 quick to parse with any modern ruby (see `read_versions.rb`).
+
+For example:
+
+```
+foo 0.0.1
+bees_in_my_eyes 1.0,1.0.1,1.1,2.0
+nokogiri 1.0.0-x86-mswin32-60,1.0.0,1.0.1,1.0.2,1.0.3,1.0.3-x86-mswin32-60,1.0.4-x86-mswin32-60,1.0.4,1.0.5,1.0.5-x86-mswin32-60
+```
 
 ### deps/*
 
@@ -42,6 +58,26 @@ This makes some assumptions: there are no names or requirements containing `:`
 or `&` characters. I believe this is valid today. These characters could be
 exchanged for non-printable characters or path characters if necessary, although
 the relative human readability is a nice to have.
+
+In order to support ruby and rubygems version requirements, there is a
+second set of requirements that may be provided on each line, separated
+from the gem requirements by the | character. After searching through
+every current gem name, all three of : & and | are unused in any gem
+name, and are not allowed to be used in any new gem name by the
+rubygems.org name validation regex.
+
+The requirements after the | character are currently limited to ruby and
+rubygems, but could be expanded to include any arbitrary requirement in
+the future. Code that parses those requirements should ignore unknown
+keys for future compatibility.
+
+```
+1.0.0
+1.1.6 rake:>= 0.7.1,activesupport:= 1.3.1,activerecord:= 1.14.4,actionpack:= 1.12.5,actionmailer:= 1.2.5,actionwebservice:= 1.1.6|ruby:> 1.8.7
+1.5.7.rc2 |ruby:>= 1.8.7,rubygems:> 1.3.1
+1.5.7.rc3 |rubygems:> 1.3.1
+1.6.0-java mini_portile:~> 0.5.0
+```
 
 ## Performance
 
