@@ -19,6 +19,7 @@ and any other tool.
 Names may be sorted alphabetically, but don't have to be. For example:
 
 ```
+# names.list
 a_gem
 bees_in_my_eyes
 foo
@@ -36,6 +37,7 @@ quick to parse with any modern ruby (see `read_versions.rb`).
 For example:
 
 ```
+# versions.list
 foo 0.0.1
 bees_in_my_eyes 1.0,1.0.1,1.1,2.0
 nokogiri 1.0.0-x86-mswin32-60,1.0.0,1.0.1,1.0.2,1.0.3,1.0.3-x86-mswin32-60,1.0.4-x86-mswin32-60,1.0.4,1.0.5,1.0.5-x86-mswin32-60
@@ -72,6 +74,7 @@ the future. Code that parses those requirements should ignore unknown
 keys for future compatibility.
 
 ```
+# deps/nokogiri
 1.0.0
 1.1.6 rake:>= 0.7.1,activesupport:= 1.3.1,activerecord:= 1.14.4,actionpack:= 1.12.5,actionmailer:= 1.2.5,actionwebservice:= 1.1.6|ruby:> 1.8.7
 1.5.7.rc2 |ruby:>= 1.8.7,rubygems:> 1.3.1
