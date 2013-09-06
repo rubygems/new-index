@@ -152,7 +152,7 @@ deps_ts = Array.new(50) do
 
       vstr = "#{spec.version.to_s}"
       vstr << "-#{spec.platform.to_s}" unless spec.platform == "ruby"
-      vstr << " " << [deps.join(","), reqs.compact.join(",")].reject(&:empty?).join("|")
+      vstr << " " << [deps.join(","), (reqs && reqs.compact.join(","))].join("|")
 
       open(file, "a+") do |io|
         io.puts vstr
