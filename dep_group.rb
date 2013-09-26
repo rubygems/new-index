@@ -1,15 +1,14 @@
 require 'rubygems'
 $LOAD_PATH.unshift File.expand_path("~/src/bundler/bundler/lib")
-require 'bundler/lazy_specification'
+require 'bundler/endpoint_specification'
 
 module Bundler
   class DepGroup
     NAME_PATTERN = /\A[a-z0-9_\-][a-z0-9_\-\.]*\Z/i
 
-    def initialize(source, *names)
+    def initialize(*names)
       @names = names
       @spec_hash = Hash.new{|h,k| h[k] = {} }
-      @source = source
     end
 
     def specs
@@ -35,11 +34,8 @@ module Bundler
             deps, reqs = dr.split('|').map{|l| l.split(",") }
             v, p = vp.split("-", 2)
             gv, gp = Gem::Version.new(v), Gem::Platform.new(p)
-            s = LazySpecification.new(name, gv, gp, @source)
-
-            deps.each do |d|
-              s.dependencies << Gem::Dependency.new(*d.split(":"))
-            end if deps
+            gd = deps.map{|d| Gem::Dependency.new(*d.split(":")) } if deps
+            s = EndpointSpecification.new(name, gv, gp, gd)
 
             reqs.each do |r|
               n,v = r.split(":")
