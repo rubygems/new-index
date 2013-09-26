@@ -4,7 +4,8 @@ require 'bundler/endpoint_specification'
 
 module Bundler
   class DepGroup
-    NAME_PATTERN = /\A[a-z0-9_\-][a-z0-9_\-\.]*\Z/i
+    NAME_PATTERN = /\A[0-9a-zA-Z_\-][0-9a-zA-Z_\-\.]*\Z/
+    VERSION_PATTERN = /\A[0-9]+(?>\.[0-9a-zA-Z]+)*(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?\Z/
 
     def initialize(*names)
       @names = names
@@ -26,11 +27,12 @@ module Bundler
 
     def parse_specs
       @names.each do |name|
+        next unless name =~ NAME_PATTERN
         File.open("deps/#{name}") do |file|
           file.each_line do |line|
             line.chomp!
-            next unless line =~ NAME_PATTERN
             vp, dr = line.split(' ', 2)
+            next unless vp =~ VERSION_PATTERN
             deps, reqs = dr.split('|').map{|l| l.split(",") }
             v, p = vp.split("-", 2)
             gv, gp = Gem::Version.new(v), Gem::Platform.new(p)
