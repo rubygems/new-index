@@ -34,10 +34,13 @@ This list is designed to be able to be easily joined using tools like awk(1) to
 produce standard `name-version[-platform].gem` file names. It is also easy and
 quick to parse with any modern ruby (see `read_versions.rb`).
 
+An arbitrary number of lines at the beginning of the file may be metadata, in 
+
 For example:
 
 ```
 # versions.list
+---
 foo 0.0.1
 bees_in_my_eyes 1.0,1.0.1,1.1,2.0
 nokogiri 1.0.0-x86-mswin32-60,1.0.0,1.0.1,1.0.2,1.0.3,1.0.3-x86-mswin32-60,1.0.4-x86-mswin32-60,1.0.4,1.0.5,1.0.5-x86-mswin32-60
