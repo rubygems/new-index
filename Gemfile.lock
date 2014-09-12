@@ -1,0 +1,10 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    net-http-persistent (2.9.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  net-http-persistent
