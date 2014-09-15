@@ -34,7 +34,8 @@ end
 # names.list is useful for first-stage discovery in mirrors, and also for the
 # command line metaphone/hamming distance helpers.
 open('names.list', 'w+') { |io| io.puts(*spec_hash.keys) }
-File.write('names.list.sha512', Digest::SHA512.file('names.list').hexdigest)
+sha = Digest::SHA512.file('names').hexdigest
+File.write('names.sha512', sha << "\n")
 
 # versions.list is useful for second stage discovery in mirrors, and also for
 # single-gem command line installations or progressive (unresolved)
@@ -47,11 +48,13 @@ File.write('names.list.sha512', Digest::SHA512.file('names.list').hexdigest)
 # efficiency would generally not affect the system in an adverse manner, and
 # could be daily/weekly/etc.
 open('versions.list', 'w+') do |io|
+  io.write "version: 1.0.0\n---\n"
   spec_hash.each do |name, versions|
     io.puts "#{name} #{versions.join(",")}"
   end
 end
-File.write('versions.list.sha512', Digest::SHA512.file('versions.list').hexdigest)
+sha = Digest::SHA512.file('versions').hexdigest
+File.write('versions.sha512', sha << "\n")
 
 
 require 'fileutils'
@@ -68,7 +71,7 @@ def progress
   $print_mutex.synchronize do
     $count += 1
     return unless $count % 1000 == 0
-    print "\r#{$count}/#{$total} #{(($count/$total.to_f) * 100).to_i} %"
+    print "\r#{$count}/#{$total} #{(($count/$total.to_f) * 100).to_i}%"
   end
 end
 
@@ -90,6 +93,15 @@ spec_ts = Array.new(50) do
       progress
 
       n, v, p = nvp
+
+      # Create a file to hold the version lines for each gem name. The files
+      # have a metadata section at the head, so we create the file and put the
+      # format version number in here before we go off and write the versions
+      # into the files.
+      unless File.exists?("info/#{n}")
+        File.write("info/#{n}", "version: 1.0.0\n---\n")
+      end
+
       file = "#{n}-#{v}#{'-' + p unless p == 'ruby'}.gemspec"
 
       if File.exists?("specs/#{file}")
@@ -97,17 +109,18 @@ spec_ts = Array.new(50) do
         next
       end
 
-      uri = "http://production.cf.rubygems.org/quick/Marshal.4.8/#{file}.rz"
-      http.request(URI uri) do |res|
-        case res
-        when Net::HTTPSuccess
-          open("specs/#{file}", "wb+") { |o| o << Gem.inflate(res.body) }
-        else
-          $stderr.puts "\nFailed download: specs/#{file}"
-        end
-      end
+      print "\nMissing spec #{file}\n"
+      # uri = "http://production.cf.rubygems.org/quick/Marshal.4.8/#{file}.rz"
+      # http.request(URI uri) do |res|
+      #   case res
+      #   when Net::HTTPSuccess
+      #     open("specs/#{file}", "wb+") { |o| o << Gem.inflate(res.body) }
+      #   else
+      #     $stderr.puts "\nFailed download: specs/#{file}"
+      #   end
+      # end
 
-      deps_q << file
+      # deps_q << file
     end
   end
 end
@@ -142,7 +155,7 @@ deps_ts = Array.new(50) do
                next
              end
 
-      file = "deps/#{spec.name}"
+      file = "info/#{spec.name}"
 
       deps = spec.dependencies.select { |d| d.respond_to?(:type) ? d.type == :runtime : true }
       deps.map! { |d| d.kind_of?(Array) ? "#{d.first} #{d[1]}" : "#{d.name}:#{d.requirements_list.join("&")}" }
