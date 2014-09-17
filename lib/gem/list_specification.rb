@@ -7,8 +7,6 @@ class Gem::ListSpecification
     @deps = deps
     @metadata = metadata
     @source = source
-
-    p metadata
   end
 
   def version
@@ -26,26 +24,30 @@ class Gem::ListSpecification
   end
 
   def required_rubygems_version
-    @required_rubygems_version ||= begin
-      Gem::Requirement.new(*metadata("rubygems"))
-    end
+    return @required_rubygems_version if defined?(@required_rubygems_version)
+
+    req = metadata("rubygems")
+    @required_rubygems_version = req ? Gem::Requirement.new(*req) : nil
   end
 
   def required_ruby_version
-    @required_ruby_version ||= begin
-      Gem::Requirement.new(*metadata("ruby"))
-    end
+    return @required_ruby_version if defined?(@required_ruby_version)
+
+    req = metadata("ruby")
+    @required_ruby_version = req ? Gem::Requirement.new(*req) : nil
   end
 
   def gem_checksum
-    @gem_checksum ||= metadata("checksum").first
+    return @gem_checksum if defined?(@gem_checksum)
+
+    sum = metadata("checksum")
+    @gem_checksum = sum ? sum.first : nil
   end
 
 private
 
   def metadata(name)
-    md = @metadata.find { |r| r.first == name }
-    md ? md.last : raise(ArgumentError, "missing metadata '#{name}'")
+    @metadata.find { |r| r.first == name }
   end
 
 end
