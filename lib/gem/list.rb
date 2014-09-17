@@ -1,87 +1,48 @@
-require 'pathname'
+require 'uri'
+
+require_relative 'list_data'
+require_relative 'list_specification'
 
 class Gem::List
-  attr_reader :dir
 
-  def initialize(dir)
-    @dir = Pathname.new(dir).expand_path
+  def initialize(source, dir)
+    @source = URI.parse(source)
+    @list_data = Gem::ListData.new(dir)
   end
 
-  def names
-    dir.join("names.list").read.lines.map!{|l| l.chomp! }
-  end
-
-  def versions
-    versions = Hash.new { |h,n| h[n] = [] }
-
-    list_lines("versions.list").each do |line|
-      name, vs = parse_versions(line)
-      versions[name].concat(vs)
-    end
-
-    versions
-  end
-
-  def info(name, version = nil)
-    return info_version(name, version) if version
-
-    list_lines("info", name).map do |line|
-      parse_info(line)
-    end
-  end
-
-  def info_version(name, version)
-    list_lines("info", name).each do |line|
-      if line =~ /\A#{Regexp.escape(version)}\s/
-        return parse_info(line)
+  def specs(*names)
+    names.map do |name|
+      @list_data.info(name).map do |data|
+        Gem::ListSpecification.new(name, *data, @source)
       end
-    end
-
-    nil
+    end.flatten(1)
   end
 
-private
-
-  def list_lines(*path)
-    lines = dir.join(*path).read.lines
-    header = lines.shift until header == "---\n"
-    lines
+  def spec(name, version, platform = nil)
+    data = @list_data.info_version(name, version, platform)
+    Gem::ListSpecification.new(name, *data, @source) if data
   end
 
-  def parse_versions(line)
-    line.chomp!
-    name, vs = line.split(' ', 2)
-    vs = vs.split(',')
-    vs.map! { |v| v.split('-', 2) }
-    [name, vs]
+  def inspect
+    "#<Gem::List source=#{@source} dir=#{@list_data.dir}>"
   end
 
-  def parse_info(line)
-    line.chomp!
-    vp, dr = line.split(' ', 2)
-    version, platform = vp.split("-", 2)
-
-    d, r = dr.split('|').map{|l| l.split(",") } if dr
-    deps = d.map { |d| parse_dependency(d) } if d
-    reqs = r.map { |r| parse_dependency(r) } if r
-
-    [version, platform, deps, reqs]
-  end
-
-  def parse_dependency(string)
-    dep = string.split(":")
-    dep[-1] = dep[-1].split("&")
-    dep
+  def to_s
+    "gems from #{@source}"
   end
 
 end
 
-if __FILE__ == $0
+if $0 == __FILE__
   dir = File.expand_path("../../../index", __FILE__)
-  list = Gem::List.new(dir)
-  # p names = list.names[0..10]
-  # p versions = list.versions.values_at(*names)
-  # p list.info("rails").find{|a| a[0] == "4.1.0" }
-  p list.info("rails", "4.1.0")
-  p list.info("rails", "4.8")
+  list = Gem::List.new("https://rubygems.org", dir)
+  p list
+  puts list.to_s
+  # p list.specs("rack-markdown", "rack-obama")
+  # p list.specs("rack")
+  # p list.spec("rack", "1.2.0")
+  # p list.spec("rack", "1.2.0", "ruby")
+  p list.spec("nokogiri", "1.5.4")
+  p list.spec("nokogiri", "1.5.4", "ruby")
+  p list.spec("nokogiri", "1.5.4", "java")
 end
