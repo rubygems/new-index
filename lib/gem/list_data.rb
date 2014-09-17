@@ -63,8 +63,8 @@ private
     version, platform = vp.split("-", 2)
 
     d, r = dr.split('|').map{|l| l.split(",") } if dr
-    deps = d.map{|h, d| parse_dependency(d) } if d
-    reqs = r.map { |r| parse_dependency(r) } if r
+    deps = d ? d.map { |d| parse_dependency(d) } : []
+    reqs = r ? r.map { |r| parse_dependency(r) } : []
 
     [version, platform, deps, reqs]
   end
@@ -79,10 +79,10 @@ end
 
 if __FILE__ == $0
   dir = File.expand_path("../../../index", __FILE__)
-  # list = Gem::List.new(dir)
+  list = Gem::ListData.new(dir)
   # p names = list.names[0..10]
   # p versions = list.versions.values_at(*names)
-  # p list.info("rails").find{|a| a[0] == "4.1.0" }
-  p list.info("rails", "4.1.0")
-  p list.info("rails", "4.8")
+  p list.info("rails").find{|a| a[0] == "4.1.0" }
+  p list.info_version("rails", "4.1.0")
+  p list.info_version("rails", "4.8")
 end
