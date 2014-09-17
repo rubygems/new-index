@@ -7,8 +7,6 @@ class Gem::ListSpecification
     @deps = deps
     @reqs = reqs
     @source = source
-
-    p deps
   end
 
   def version
