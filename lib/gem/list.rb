@@ -37,12 +37,16 @@ if $0 == __FILE__
   dir = File.expand_path("../../../index", __FILE__)
   list = Gem::List.new("https://rubygems.org", dir)
   p list
-  puts list.to_s
   # p list.specs("rack-markdown", "rack-obama")
   # p list.specs("rack")
   # p list.spec("rack", "1.2.0")
   # p list.spec("rack", "1.2.0", "ruby")
-  p list.spec("nokogiri", "1.5.4")
-  p list.spec("nokogiri", "1.5.4", "ruby")
-  p list.spec("nokogiri", "1.5.4", "java")
+  # p list.spec("nokogiri", "1.5.4")
+  # p list.spec("nokogiri", "1.5.4", "ruby")
+  # p list.spec("nokogiri", "1.5.4", "java")
+  p ar=list.spec("activerecord", "4.1.2")
+  p ar.dependencies
+  p ar.gem_checksum
+  p ar.required_rubygems_version
+  p ar.required_ruby_version
 end

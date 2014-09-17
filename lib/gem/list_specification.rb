@@ -1,12 +1,14 @@
 class Gem::ListSpecification
 
-  def initialize(name, version, platform, deps, reqs, source)
+  def initialize(name, version, platform, deps, metadata, source)
     @name = name
     @version_str = version
     @platform_str = platform
     @deps = deps
-    @reqs = reqs
+    @metadata = metadata
     @source = source
+
+    p metadata
   end
 
   def version
@@ -18,15 +20,32 @@ class Gem::ListSpecification
   end
 
   def dependencies
+    @dependencies ||= @deps.nil? ? [] : @deps.map do |d|
+      Gem::Dependency.new(*d)
+    end
   end
 
   def required_rubygems_version
+    @required_rubygems_version ||= begin
+      Gem::Requirement.new(*metadata("rubygems"))
+    end
   end
 
   def required_ruby_version
+    @required_ruby_version ||= begin
+      Gem::Requirement.new(*metadata("ruby"))
+    end
   end
 
   def gem_checksum
+    @gem_checksum ||= metadata("checksum").first
+  end
+
+private
+
+  def metadata(name)
+    md = @metadata.find { |r| r.first == name }
+    md ? md.last : raise(ArgumentError, "missing metadata '#{name}'")
   end
 
 end
