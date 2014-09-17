@@ -1,0 +1,1 @@
+exclude = '{$exclude,index/specs,index/info,index/gems}'
