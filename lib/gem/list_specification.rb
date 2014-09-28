@@ -27,19 +27,18 @@ class Gem::ListSpecification
     return @required_rubygems_version if defined?(@required_rubygems_version)
 
     req = metadata("rubygems")
-    @required_rubygems_version = req ? Gem::Requirement.new(*req) : nil
+    @required_rubygems_version = req ? Gem::Requirement.new(req) : nil
   end
 
   def required_ruby_version
     return @required_ruby_version if defined?(@required_ruby_version)
 
     req = metadata("ruby")
-    @required_ruby_version = req ? Gem::Requirement.new(*req) : nil
+    @required_ruby_version = req ? Gem::Requirement.new(req) : nil
   end
 
   def gem_checksum
     return @gem_checksum if defined?(@gem_checksum)
-
     sum = metadata("checksum")
     @gem_checksum = sum ? sum.first : nil
   end
@@ -47,7 +46,8 @@ class Gem::ListSpecification
 private
 
   def metadata(name)
-    @metadata.find { |r| r.first == name }
+    md = @metadata.find { |r| r.first == name }
+    md ? md.last : nil
   end
 
 end

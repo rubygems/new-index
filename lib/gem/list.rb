@@ -47,6 +47,6 @@ if $0 == __FILE__
   p ar=list.spec("activerecord", "4.1.2")
   p ar.dependencies
   p ar.gem_checksum
-  p ar.required_rubygems_version
-  p ar.required_ruby_version
+  p ar.required_rubygems_version.to_s
+  p ar.required_ruby_version.to_s
 end
