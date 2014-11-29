@@ -12,10 +12,11 @@ class Gem::ListData
   end
 
   def versions
-    versions = Hash.new { |h,n| h[n] = [] }
+    versions = {}
 
     list_lines("versions").each do |line|
       name, vs = parse_versions(line)
+      versions[name] ||= []
       versions[name].concat(vs)
     end
 
