@@ -44,9 +44,12 @@ class Gem::ListData
 private
 
   def list_lines(*path)
-    lines = dir.join(*path).read.lines
-    header = lines.shift until header == "---\n"
-    lines
+    file = dir.join(*path)
+    return [] unless file.file?
+
+    lines = file.read.lines
+    header = lines.index("---\n")
+    header ? lines[header+1..-1] : lines
   end
 
   def parse_versions(line)
